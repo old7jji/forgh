@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>Arabic Poem Particle Animation</title>
+  <style>
+    :root {
+      --sky-top: #12091b;
+      --sky-bottom: #1d1230;
+      --grass: #1b5f3d;
+      --grass-dark: #0f402d;
+      --stem: #2d8f5d;
+      --leaf: #4fbf77;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: linear-gradient(to bottom, var(--sky-top), var(--sky-bottom));
+      font-family: Tahoma, Arial, sans-serif;
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .garden {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 32vh;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      gap: 12px;
+      padding: 0 3vw 0 3vw;
+      z-index: 1;
+      pointer-events: none;
+      background: linear-gradient(to top, rgba(17, 81, 52, 0.9), rgba(17, 81, 52, 0.1) 55%, transparent);
+    }
+
+    .flower {
+      position: relative;
+      width: 70px;
+      height: 180px;
+      animation: sway 5s ease-in-out infinite alternate;
+      --petal-a: #ff79b0;
+      --petal-b: #ffd166;
+      --petal-c: #ffb5d2;
+      --petal-d: #f7a9d0;
+      --center: #fff0a5;
+    }
+
+    .flower:nth-child(2n) {
+      animation-delay: 0.6s;
+    }
+
+    .flower:nth-child(3n) {
+      animation-delay: 1.2s;
+    }
+
+    .stem {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 4px;
+      height: 118px;
+      background: linear-gradient(to bottom, var(--stem), #1d6d47);
+      transform: translateX(-50%);
+      border-radius: 999px;
+    }
+
+    .leaf {
+      position: absolute;
+      width: 28px;
+      height: 18px;
+      background: linear-gradient(135deg, var(--leaf), #76d98c);
+      border-radius: 80% 0 80% 0;
+      bottom: 62px;
+      box-shadow: inset -4px -4px 0 rgba(255,255,255,0.18);
+    }
+
+    .leaf.left {
+      left: 12px;
+      transform: rotate(-28deg);
+    }
+
+    .leaf.right {
+      right: 12px;
+      transform: scaleX(-1) rotate(-28deg);
+    }
+
+    .bloom {
+      position: absolute;
+      left: 50%;
+      top: 10px;
+      width: 58px;
+      height: 58px;
+      transform: translateX(-50%);
+    }
+
+    .petal {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 18px;
+      height: 30px;
+      margin-left: -9px;
+      margin-top: -15px;
+      border-radius: 70% 70% 70% 70%;
+      background: linear-gradient(to bottom, var(--petal-a), var(--petal-b));
+      transform-origin: center bottom;
+      box-shadow: inset -2px -3px 0 rgba(255,255,255,0.2);
+    }
+
+    .petal:nth-child(1) { transform: rotate(0deg) translateY(-18px); background: linear-gradient(to bottom, var(--petal-a), var(--petal-b)); }
+    .petal:nth-child(2) { transform: rotate(60deg) translateY(-18px); background: linear-gradient(to bottom, var(--petal-c), var(--petal-d)); }
+    .petal:nth-child(3) { transform: rotate(120deg) translateY(-18px); background: linear-gradient(to bottom, var(--petal-b), var(--petal-a)); }
+    .petal:nth-child(4) { transform: rotate(180deg) translateY(-18px); background: linear-gradient(to bottom, var(--petal-d), var(--petal-c)); }
+    .petal:nth-child(5) { transform: rotate(240deg) translateY(-18px); background: linear-gradient(to bottom, var(--petal-a), var(--petal-c)); }
+    .petal:nth-child(6) { transform: rotate(300deg) translateY(-18px); background: linear-gradient(to bottom, var(--petal-b), var(--petal-d)); }
+
+    .center {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, #fff8bf 0%, var(--center) 40%, #f8bc2d 100%);
+      box-shadow: 0 0 18px rgba(255, 214, 102, 0.8);
+    }
+
+    @keyframes sway {
+      0% {
+        transform: rotate(-2deg) translateY(0);
+      }
+      100% {
+        transform: rotate(2deg) translateY(-5px);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="particleCanvas"></canvas>
+
+<div class="garden" aria-hidden="true">
+  <div class="flower" style="--petal-a:#ff8ab6; --petal-b:#ffc1d9; --petal-c:#ffd166; --petal-d:#f9a66b;">
+    <span class="stem"></span>
+    <span class="leaf left"></span>
+    <span class="leaf right"></span>
+    <span class="bloom">
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="center"></span>
+    </span>
+  </div>
+
+  <div class="flower" style="--petal-a:#ff7aa2; --petal-b:#ffb7b2; --petal-c:#f7d477; --petal-d:#ff9ec4;">
+    <span class="stem"></span>
+    <span class="leaf left"></span>
+    <span class="leaf right"></span>
+    <span class="bloom">
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="center"></span>
+    </span>
+  </div>
+
+  <div class="flower" style="--petal-a:#f7a8d0; --petal-b:#ffd6a5; --petal-c:#ff8eb3; --petal-d:#ffc4d4;">
+    <span class="stem"></span>
+    <span class="leaf left"></span>
+    <span class="leaf right"></span>
+    <span class="bloom">
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="center"></span>
+    </span>
+  </div>
+
+  <div class="flower" style="--petal-a:#f9a8d0; --petal-b:#ffe08e; --petal-c:#ff8ca8; --petal-d:#ffd5e5;">
+    <span class="stem"></span>
+    <span class="leaf left"></span>
+    <span class="leaf right"></span>
+    <span class="bloom">
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="center"></span>
+    </span>
+  </div>
+
+  <div class="flower" style="--petal-a:#ff86b8; --petal-b:#ffd9b8; --petal-c:#f7b7d9; --petal-d:#ffbf69;">
+    <span class="stem"></span>
+    <span class="leaf left"></span>
+    <span class="leaf right"></span>
+    <span class="bloom">
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="center"></span>
+    </span>
+  </div>
+
+  <div class="flower" style="--petal-a:#ff9ec4; --petal-b:#fce38a; --petal-c:#ef7ea9; --petal-d:#ffb09c;">
+    <span class="stem"></span>
+    <span class="leaf left"></span>
+    <span class="leaf right"></span>
+    <span class="bloom">
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="petal"></span>
+      <span class="center"></span>
+    </span>
+  </div>
+</div>
+
+<script>
+  const canvas = document.getElementById('particleCanvas');
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const config = {
+      count: 1800,
+      size: 3.0,
+      speed: 0.015
+  };
+
+  let particles = [];
+  let progress = 0;
+
+   function drawParticle(ctx, x, y, size, type) {
+      ctx.beginPath();
+      if (type === 'star') {
+          for (let i = 0; i < 4; i++) {
+              let angle = (i * Math.PI) / 2;
+              let dx = size * Math.cos(angle);
+              let dy = size * Math.sin(angle);
+              ctx.moveTo(x - dx, y - dy);
+              ctx.lineTo(x + dx, y + dy);
+          }
+          ctx.strokeStyle = "#FFD700";
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+      } else if (type === 'heart') {
+          ctx.fillStyle = "#FFC107";          ctx.moveTo(x, y);
+          ctx.bezierCurveTo(x - size, y - size, x - size * 1.5, y + size / 3, x, y + size);
+          ctx.bezierCurveTo(x + size * 1.5, y + size / 3, x + size, y - size, x, y);
+          ctx.fill();
+      }
+  }
+  function updateTargets() {
+      particles = [];
+      progress = 0;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "white";
+      
+      let fontSize = Math.min(canvas.width / 15, 65);
+      ctx.font = `bold ${fontSize}px Tahoma, Arial, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      
+      const text = "وَمَا كانَ قَلْبِي لِغَيْرِكِ أنْ يَمِيلا";
+      ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+      let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      let validTargets = [];
+      let step = 3;
+
+      for (let y = 0; y < canvas.height; y += step) {
+          for (let x = 0; x < canvas.width; x += step) {
+              let index = (y * canvas.width + x) * 4;
+              if (imgData[index + 3] > 128) {
+                  validTargets.push({ x: x, y: y });
+              }
+          }
+      }
+
+      if (validTargets.length === 0) return;
+
+      for (let i = 0; i < config.count; i++) {
+          let target = validTargets[i % validTargets.length];
+          let spread = Math.random() * 5;
+          let angle = Math.random() * Math.PI * 2;
+
+          particles.push({
+              sx: (Math.random() - 0.5) * canvas.width,
+              sy: (Math.random() - 0.5) * canvas.height,
+              tx: target.x + spread * Math.cos(angle) - canvas.width / 2,
+              ty: target.y + spread * Math.sin(angle) - canvas.height / 2,
+              size: Math.random() * 2 + 1.2,
+              type: Math.random() > 0.4 ? 'star' : 'heart'
+          });
+      }
+  }
+
+  function animate() {
+      ctx.fillStyle = "rgba(11, 6, 18, 0.25)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (progress < 1) progress += config.speed;
+      let eased = Math.sin((progress * Math.PI) / 2);
+      for (let p of particles) {
+          let cx = canvas.width / 2 + p.sx + (p.tx - p.sx) * eased;
+          let cy = canvas.height / 2 + p.sy + (p.ty - p.sy) * eased;
+
+          drawParticle(ctx, cx, cy, p.size, p.type);
+      }
+
+        const fontSize = Math.min(canvas.width / 15, 65);
+        ctx.save();
+        ctx.fillStyle = "#ff7aa8";
+        ctx.font = "24px Tahoma, Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        for (let i = 0; i < 8; i++) {
+          ctx.fillText("♥", canvas.width / 2 + (i - 3.5) * 30, canvas.height / 2 - fontSize / 2 - 30);
+        }
+        ctx.restore();
+
+      requestAnimationFrame(animate);
+  }
+
+  updateTargets();
+  animate();
+
+  window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      updateTargets();
+  });
+</script>
+
+</body>
+</html>
